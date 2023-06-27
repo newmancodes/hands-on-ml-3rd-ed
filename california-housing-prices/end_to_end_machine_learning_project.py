@@ -1,6 +1,7 @@
-import sys
+import numpy as np
 from pathlib import Path
 import pandas as pd
+import sys
 import tarfile
 import urllib.request
 
@@ -16,5 +17,13 @@ def load_housing_data():
             housing_tarball.extractall(path="datasets")
     return pd.read_csv(Path("datasets/housing/housing.csv"))
 
+def shuffle_and_split_data(data, test_ratio):
+    shuffled_indices = np.random.permutation(len(data))
+    test_set_size = int(len(data) * test_ratio)
+    test_indices = shuffled_indices[:test_set_size]
+    train_indices = shuffled_indices[test_set_size:]
+    return data.iloc[train_indices], data.iloc[test_indices]
+
 housing = load_housing_data()
-housing.info()
+train_set, test_set = shuffle_and_split_data(housing, 0.2)
+print(f'{len(train_set)} houses in the training set, {len(test_set)} houses in the test set.')
