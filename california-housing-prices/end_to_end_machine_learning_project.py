@@ -40,7 +40,10 @@ housing = load_housing_data()
 
 # train_set, test_set = shuffle_and_split_data(housing, 0.2)
 
-housing_with_id = housing.reset_index()
-train_set, test_set = split_data_with_id_hash(housing_with_id, 0.2, "index")
+housing_with_id = housing.reset_index() # Add an index column - fails if new data is not always appended to the end of the dataset
+#train_set, test_set = split_data_with_id_hash(housing_with_id, 0.2, "index")
+
+housing_with_id["id"] = housing["longitude"] * 1000 + housing["latitude"] # to counter the above, create a unique id by joining the long and lat values
+train_set, test_set = split_data_with_id_hash(housing_with_id, 0.2, "id")
 
 print(f'{len(train_set)} houses in the training set, {len(test_set)} houses in the test set.')
