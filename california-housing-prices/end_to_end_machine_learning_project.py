@@ -1,10 +1,13 @@
-import numpy as np
 from pathlib import Path
-import pandas as pd
 import sys
 import tarfile
 import urllib.request
 from zlib import crc32
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
 
 assert sys.version_info >= (3, 7)
 
@@ -19,9 +22,10 @@ def load_housing_data():
     return pd.read_csv(Path("datasets/housing/housing.csv"))
 
 def shuffle_and_split_data(data, test_ratio):
-    # Splits the supplied data into training and a test set of data in accordance with the supplied ratio
-    # This approach has downsides as it is random, meaning that each time this split is performed
-    # different records will appear in the training or test sets.
+    # Splits the supplied data into training and a test set of data in accordance
+    # with the supplied ratio. This approach has downsides as it is random, meaning
+    # that each time this split is performed different records will appear in the
+    # training or test sets.
     shuffled_indices = np.random.permutation(len(data))
     test_set_size = int(len(data) * test_ratio)
     test_indices = shuffled_indices[:test_set_size]
@@ -40,10 +44,26 @@ housing = load_housing_data()
 
 # train_set, test_set = shuffle_and_split_data(housing, 0.2)
 
-housing_with_id = housing.reset_index() # Add an index column - fails if new data is not always appended to the end of the dataset
+# Add an index column - fails if new data is not always appended to the end of the dataset
+#housing_with_id = housing.reset_index()
 #train_set, test_set = split_data_with_id_hash(housing_with_id, 0.2, "index")
 
-housing_with_id["id"] = housing["longitude"] * 1000 + housing["latitude"] # to counter the above, create a unique id by joining the long and lat values
-train_set, test_set = split_data_with_id_hash(housing_with_id, 0.2, "id")
+# to counter the above, create a unique id by joining the long and lat values
+#housing_with_id["id"] = housing["longitude"] * 1000 + housing["latitude"]
+#train_set, test_set = split_data_with_id_hash(housing_with_id, 0.2, "id")
+
+ # Leverage scikit-learn
+train_set, test_set = train_test_split(housing,
+                                       test_size=0.2,
+                                       random_state=42)
 
 print(f'{len(train_set)} houses in the training set, {len(test_set)} houses in the test set.')
+
+housing["income_cat"] = pd.cut(housing["median_income"],
+                               bins=[0., 1.5, 3.0, 4.5, 6., np.inf],
+                               labels=[1, 2, 3, 4, 5])
+
+housing["income_cat"].value_counts().sort_index().plot.bar(rot=0, grid=True)
+plt.xlabel("Income category")
+plt.ylabel("Number of districts")
+plt.savefig("Histogram of income categories")
