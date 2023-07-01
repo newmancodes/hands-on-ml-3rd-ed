@@ -108,3 +108,6 @@ print(corr_matrix["median_house_value"].sort_values(ascending=False))
 attributes = ["median_house_value", "median_income", "total_rooms", "housing_median_age"]
 scatter_matrix(housing[attributes], figsize=(12, 8))
 plt.savefig("Scatter matrix")
+
+housing.plot(kind="scatter", x="median_income", y="median_house_value", alpha=0.1, grid=True)
+plt.savefig("Median income versus median house value")
