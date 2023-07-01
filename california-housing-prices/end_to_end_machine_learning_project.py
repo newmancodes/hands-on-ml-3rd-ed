@@ -9,6 +9,7 @@ from zlib import crc32
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from pandas.plotting import scatter_matrix
 from sklearn.model_selection import train_test_split, StratifiedShuffleSplit
 
 assert sys.version_info >= (3, 7)
@@ -89,6 +90,7 @@ strat_train_set, strat_test_set = train_test_split(housing,
 
 for set_ in (strat_train_set, strat_test_set):
     set_.drop("income_cat", axis=1, inplace=True)
+    set_.drop("ocean_proximity", axis=1, inplace=True)
 
 housing = strat_train_set.copy()
 housing.plot(kind="scatter", x="longitude", y="latitude", grid=True, alpha=0.2)
@@ -99,3 +101,10 @@ housing.plot(kind="scatter", x="longitude", y="latitude", grid=True,
              c="median_house_value", cmap="jet", colorbar=True,
              legend=True, sharex=False, figsize=(10, 7))
 plt.savefig("California housing prices")
+
+corr_matrix = housing.corr()
+print(corr_matrix["median_house_value"].sort_values(ascending=False))
+
+attributes = ["median_house_value", "median_income", "total_rooms", "housing_median_age"]
+scatter_matrix(housing[attributes], figsize=(12, 8))
+plt.savefig("Scatter matrix")
