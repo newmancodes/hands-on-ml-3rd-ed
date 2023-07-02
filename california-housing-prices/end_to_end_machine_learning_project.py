@@ -111,3 +111,9 @@ plt.savefig("Scatter matrix")
 
 housing.plot(kind="scatter", x="median_income", y="median_house_value", alpha=0.1, grid=True)
 plt.savefig("Median income versus median house value")
+
+housing["rooms_per_house"] = housing["total_rooms"] / housing["households"]
+housing["bedrooms_ratio"] = housing["total_bedrooms"] / housing["total_rooms"]
+housing["people_per_house"] = housing["population"] / housing["households"]
+corr_matrix = housing.corr()
+print(corr_matrix["median_house_value"].sort_values(ascending=False))
